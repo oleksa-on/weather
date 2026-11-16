@@ -1,8 +1,12 @@
 name: Render Kindle Weather
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '*/15 * * * *'
   workflow_dispatch:
+
+concurrency:
+  group: render-weather
+  cancel-in-progress: true
 
 permissions:
   contents: write

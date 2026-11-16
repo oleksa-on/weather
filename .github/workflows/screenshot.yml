@@ -1,0 +1,31 @@
+name: Render Kindle Weather
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shot-scraper & imagemagick
+        run: |
+          pip install shot-scraper
+          shot-scraper install
+          sudo apt-get update && sudo apt-get install -y imagemagick
+      - name: Take screenshot
+        run: |
+          shot-scraper index.html -w 600 -h 800 --wait 3000 -o raw.png
+          convert raw.png -colorspace Gray -depth 8 weather.png
+          rm raw.png
+      - name: Commit PNG
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add weather.png
+          git commit -m "Update weather" || exit 0
+          git push
